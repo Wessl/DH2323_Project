@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class PlayerController : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class PlayerController : MonoBehaviour
     public float jumpHeight = 3f;
     private Vector3 _velocity;
     private bool _isGrounded;
+    
+    
     void Update()
     {
         _isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);

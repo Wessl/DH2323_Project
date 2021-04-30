@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.VFX;
 using UnityEngine.Windows.Speech;
 
 public class VoiceCommands : MonoBehaviour
@@ -13,6 +14,10 @@ public class VoiceCommands : MonoBehaviour
     public float lightningRadius;
     public LayerMask enemyLayer;
     public float LightningPunchStrength;
+    public VisualEffect lightningFX;
+    private float lightningScaler;
+    private int lightningDistanceToEnemyPropertyID;
+    public float lightningImpactDelay;
     
     void Start()
     {
@@ -32,6 +37,11 @@ public class VoiceCommands : MonoBehaviour
         {
             Debug.Log(mic);
         }
+        
+        // Misc
+        lightningScaler = 6;        // This is the scale of the lightning strike in the Z direction, use to scale down position values
+        lightningDistanceToEnemyPropertyID = Shader.PropertyToID("DistanceToEnemy");
+        
     }
 
     private void OnKeywordsRecognized(PhraseRecognizedEventArgs args)
@@ -45,6 +55,17 @@ public class VoiceCommands : MonoBehaviour
         Debug.Log("Lightning triggered");
         GameObject enemy = FindNearestEnemy();
         Vector3 direction = enemy.transform.position - transform.position;
+        // Instantiate lightning strike
+        var lightning = Instantiate(lightningFX, transform.position, Quaternion.identity);
+        var lightningTransform = lightning.transform;
+        lightningTransform.rotation = Quaternion.LookRotation(direction, transform.up);
+        lightningFX.SetFloat(lightningDistanceToEnemyPropertyID, direction.magnitude);
+        StartCoroutine(LightningPushForce(enemy, direction));
+    }
+
+    IEnumerator LightningPushForce(GameObject enemy, Vector3 direction)
+    {
+        yield return new WaitForSeconds(lightningImpactDelay);
         // Add force to the enemy, roughly a 20 degree arc from the ground
         enemy.GetComponent<Rigidbody>().AddForce(direction.normalized * LightningPunchStrength + Vector3.up * LightningPunchStrength / 5, ForceMode.Impulse);
     }
