@@ -59,7 +59,7 @@ public class VoiceCommands : MonoBehaviour
         var lightning = Instantiate(lightningFX, transform.position, Quaternion.identity);
         var lightningTransform = lightning.transform;
         lightningTransform.rotation = Quaternion.LookRotation(direction, transform.up);
-        lightningFX.SetFloat(lightningDistanceToEnemyPropertyID, direction.magnitude);
+        lightning.SetFloat(lightningDistanceToEnemyPropertyID, direction.magnitude);
         StartCoroutine(LightningPushForce(enemy, direction));
     }
 
@@ -86,13 +86,11 @@ public class VoiceCommands : MonoBehaviour
         {
             if (hit.CompareTag("Enemy"))
             {
-                // Enemy found
                 Debug.Log("I'm going to attack " + hit.name);
                 return hit.gameObject;
                 break;  // Only attack one?
             }
         }
-
         return null;
     }
 
