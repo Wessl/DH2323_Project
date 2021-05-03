@@ -15,16 +15,21 @@ public class VoiceCommands : MonoBehaviour
     public LayerMask enemyLayer;
     public float LightningPunchStrength;
     public VisualEffect lightningFX;
+    public ParticleSystem windFX;
     private float lightningScaler;
     private int lightningDistanceToEnemyPropertyID;
     public float lightningImpactDelay;
+
+    public string lightningKeyword;
+    public string waterKeyword;
+    public string windKeyword;
     
     void Start()
     {
         // I have scrapped the idea of using mouth sounds similar to the real phenomena, probably wont work
-        _keywordActions.Add("Thunder", Lightning);
-        _keywordActions.Add("Water", Water);
-        _keywordActions.Add("Air", Air);
+        _keywordActions.Add(lightningKeyword, Lightning);
+        _keywordActions.Add(waterKeyword, Water);
+        _keywordActions.Add(windKeyword, Wind);
 
         _keywordRecognizer = new KeywordRecognizer(_keywordActions.Keys.ToArray()); //, confidence);
         _keywordRecognizer.OnPhraseRecognized += OnKeywordsRecognized;
@@ -73,9 +78,10 @@ public class VoiceCommands : MonoBehaviour
     {
         Debug.Log("Water triggered");
     }
-    private void Air()
+    private void Wind()
     {
         Debug.Log("Air triggered");
+        Instantiate(windFX, transform.position, transform.rotation);
     }
 
     // Finds and returns the nearest enemy within 
