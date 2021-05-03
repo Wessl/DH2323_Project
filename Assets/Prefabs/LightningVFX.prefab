@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6365089952075751344}
   - component: {fileID: 6365089952075751351}
   - component: {fileID: 6365089952075751350}
+  - component: {fileID: 781870441}
   m_Layer: 0
   m_Name: LightningVFX
   m_TagString: Untagged
@@ -25,7 +26,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6365089952075751349}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -49,11 +50,14 @@ VisualEffect:
   m_PropertySheet:
     m_Float:
       m_Array:
-      - m_Value: 6
+      - m_Value: 0
         m_Name: ImpactOffset
-        m_Overridden: 1
+        m_Overridden: 0
       - m_Value: 0.16
         m_Name: ImpactDelay
+        m_Overridden: 1
+      - m_Value: 6
+        m_Name: DistanceToEnemy
         m_Overridden: 1
     m_Vector2f:
       m_Array: []
@@ -126,3 +130,16 @@ VFXRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &781870441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6365089952075751349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a13986817afe3064580a1a8fd5b20e86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  destroyAfterSeconds: 10

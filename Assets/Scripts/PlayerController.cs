@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,10 +16,20 @@ public class PlayerController : MonoBehaviour
     public float jumpHeight = 3f;
     private Vector3 _velocity;
     private bool _isGrounded;
-    
-    
+    private bool _canMove;
+
+    private void Start()
+    {
+        _canMove = true;
+    }
+
+
     void Update()
     {
+        if (!_canMove)
+        {
+            return;
+        }
         _isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
         if (_isGrounded && _velocity.y < 0)
@@ -40,5 +51,11 @@ public class PlayerController : MonoBehaviour
         _velocity.y += gravity * Time.deltaTime;
 
         controller.Move(_velocity * Time.deltaTime);
+    }
+    
+    public bool CanMove
+    {
+        get => _canMove;           
+        set => _canMove = value; 
     }
 }
