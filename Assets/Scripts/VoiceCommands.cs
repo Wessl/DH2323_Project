@@ -16,7 +16,7 @@ public class VoiceCommands : MonoBehaviour
     public float lightningPunchStrength;
     public VisualEffect lightningFX;
     public ParticleSystem windFX;
-    private float _lightningScaler;
+    public ParticleSystem waterFX;
     private int _lightningDistanceToEnemyPropertyID;
     public float lightningImpactDelay;
 
@@ -25,10 +25,10 @@ public class VoiceCommands : MonoBehaviour
     public string windKeyword;
 
     public bool limitLightningToOneEnemy;
+    private bool waterIsPlaying;
 
     void Start()
     {
-        // I have scrapped the idea of using mouth sounds similar to the real phenomena, probably wont work
         _keywordActions.Add(lightningKeyword, Lightning);
         _keywordActions.Add(waterKeyword, Water);
         _keywordActions.Add(windKeyword, Wind);
@@ -37,7 +37,7 @@ public class VoiceCommands : MonoBehaviour
         _keywordRecognizer.OnPhraseRecognized += OnKeywordsRecognized;
         _keywordRecognizer.Start();
         
-        // Some debugging to make sure correct mic is running
+        // Make sure correct mic is running
         Debug.Log( _keywordRecognizer.IsRunning );
         var mics = Microphone.devices;
         foreach (var mic in mics)
@@ -46,9 +46,9 @@ public class VoiceCommands : MonoBehaviour
         }
         
         // Misc
-        _lightningScaler = 6;        // This is the scale of the lightning strike in the Z direction, use to scale down position values
         _lightningDistanceToEnemyPropertyID = Shader.PropertyToID("DistanceToEnemy");
-        
+        waterIsPlaying = false;
+
     }
 
     private void OnKeywordsRecognized(PhraseRecognizedEventArgs args)
@@ -87,6 +87,13 @@ public class VoiceCommands : MonoBehaviour
     private void Water()
     {
         Debug.Log("Water triggered");
+        if (waterIsPlaying)
+        {
+            // destroy old water
+            waterIsPlaying = false;
+        }
+        var waterSpawn = Instantiate(waterFX, transform.position, transform.rotation);
+        waterSpawn.transform.parent = transform;    // Set player as parent
     }
     private void Wind()
     {
