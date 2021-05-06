@@ -13,17 +13,19 @@ public class VoiceCommands : MonoBehaviour
     public ConfidenceLevel confidence = ConfidenceLevel.Medium;
     public float lightningRadius;
     public LayerMask enemyLayer;
-    public float LightningPunchStrength;
+    public float lightningPunchStrength;
     public VisualEffect lightningFX;
     public ParticleSystem windFX;
-    private float lightningScaler;
-    private int lightningDistanceToEnemyPropertyID;
+    private float _lightningScaler;
+    private int _lightningDistanceToEnemyPropertyID;
     public float lightningImpactDelay;
 
     public string lightningKeyword;
     public string waterKeyword;
     public string windKeyword;
-    
+
+    public bool limitLightningToOneEnemy;
+
     void Start()
     {
         // I have scrapped the idea of using mouth sounds similar to the real phenomena, probably wont work
@@ -44,8 +46,8 @@ public class VoiceCommands : MonoBehaviour
         }
         
         // Misc
-        lightningScaler = 6;        // This is the scale of the lightning strike in the Z direction, use to scale down position values
-        lightningDistanceToEnemyPropertyID = Shader.PropertyToID("DistanceToEnemy");
+        _lightningScaler = 6;        // This is the scale of the lightning strike in the Z direction, use to scale down position values
+        _lightningDistanceToEnemyPropertyID = Shader.PropertyToID("DistanceToEnemy");
         
     }
 
@@ -58,21 +60,29 @@ public class VoiceCommands : MonoBehaviour
     private void Lightning()
     {
         Debug.Log("Lightning triggered");
-        GameObject enemy = FindNearestEnemy();
-        Vector3 direction = enemy.transform.position - transform.position;
-        // Instantiate lightning strike
-        var lightning = Instantiate(lightningFX, transform.position, Quaternion.identity);
-        var lightningTransform = lightning.transform;
-        lightningTransform.rotation = Quaternion.LookRotation(direction, transform.up);
-        lightning.SetFloat(lightningDistanceToEnemyPropertyID, direction.magnitude);
-        StartCoroutine(LightningPushForce(enemy, direction));
+        List<GameObject> enemies = FindEnemiesByDist();
+        foreach (var enemy in enemies)
+        {
+            Vector3 direction = enemy.transform.position - transform.position;
+            // Instantiate lightning strike
+            var lightning = Instantiate(lightningFX, transform.position, Quaternion.identity);
+            var lightningTransform = lightning.transform;
+            lightningTransform.rotation = Quaternion.LookRotation(direction, transform.up);
+            lightning.SetFloat(_lightningDistanceToEnemyPropertyID, direction.magnitude);
+            StartCoroutine(LightningPushForce(enemy, direction));
+
+            if (limitLightningToOneEnemy)
+            {
+                break;
+            }
+        }
     }
 
     IEnumerator LightningPushForce(GameObject enemy, Vector3 direction)
     {
         yield return new WaitForSeconds(lightningImpactDelay);
         // Add force to the enemy, roughly a 20 degree arc from the ground
-        enemy.GetComponent<Rigidbody>().AddForce(direction.normalized * LightningPunchStrength + Vector3.up * LightningPunchStrength / 5, ForceMode.Impulse);
+        enemy.GetComponent<Rigidbody>().AddForce(direction.normalized * lightningPunchStrength + Vector3.up * lightningPunchStrength / 5, ForceMode.Impulse);
     }
     private void Water()
     {
@@ -85,19 +95,27 @@ public class VoiceCommands : MonoBehaviour
     }
 
     // Finds and returns the nearest enemy within 
-    private GameObject FindNearestEnemy()
+    List<GameObject> FindEnemiesByDist()
     {
-        Collider[] hits = Physics.OverlapSphere(transform.position, lightningRadius, enemyLayer);
+        var myPos = transform.position;
+        Collider[] hits = Physics.OverlapSphere(myPos, lightningRadius, enemyLayer);
+        List<GameObject> enemiesHit = new List<GameObject>();
         foreach (var hit in hits)
         {
             if (hit.CompareTag("Enemy"))
             {
-                Debug.Log("I'm going to attack " + hit.name);
-                return hit.gameObject;
-                break;  // Only attack one?
+                enemiesHit.Add(hit.gameObject);
             }
         }
-        return null;
+        // Sort by distance
+        enemiesHit.Sort((a,b) => GetDist(a,myPos).CompareTo(GetDist(b,myPos)));
+        return enemiesHit;
+    }
+
+    // This needs to be BLAZING FAST
+    private float GetDist(GameObject a, Vector3 pos)
+    {
+        return (a.transform.position - pos).magnitude;
     }
 
     private void OnDrawGizmos()
