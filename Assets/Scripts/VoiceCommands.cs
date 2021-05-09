@@ -25,7 +25,10 @@ public class VoiceCommands : MonoBehaviour
     public string windKeyword;
 
     public bool limitLightningToOneEnemy;
-    private bool waterIsPlaying;
+    private bool _waterIsPlaying;
+    private bool _waterShutDownPeriod;
+    private ParticleSystem _waterSpawn;
+    private float _waterScaleModifier;
 
     void Start()
     {
@@ -47,8 +50,17 @@ public class VoiceCommands : MonoBehaviour
         
         // Misc
         _lightningDistanceToEnemyPropertyID = Shader.PropertyToID("DistanceToEnemy");
-        waterIsPlaying = false;
+        _waterIsPlaying = false;
+        _waterShutDownPeriod = false;
+        _waterScaleModifier = 1;
+    }
 
+    void Update()
+    {
+        if (_waterShutDownPeriod)
+        {
+            StartCoroutine(WaterShutDown(0, 1));
+        }
     }
 
     private void OnKeywordsRecognized(PhraseRecognizedEventArgs args)
@@ -87,14 +99,38 @@ public class VoiceCommands : MonoBehaviour
     private void Water()
     {
         Debug.Log("Water triggered");
-        if (waterIsPlaying)
+        if (_waterIsPlaying && !_waterShutDownPeriod)
         {
             // destroy old water
-            waterIsPlaying = false;
+            _waterIsPlaying = false;
+            _waterShutDownPeriod = true;
         }
-        var waterSpawn = Instantiate(waterFX, transform.position, transform.rotation);
-        waterSpawn.transform.parent = transform;    // Set player as parent
+        else
+        {
+            _waterSpawn = Instantiate(waterFX, transform.position, transform.rotation);
+            _waterSpawn.transform.parent = transform;    // Set player as parent
+            _waterIsPlaying = true;
+        }
     }
+
+    IEnumerator WaterShutDown(float endValue, float duration)
+    {
+        float time = 0;
+        float startValue = _waterScaleModifier;
+        Vector3 startScale = _waterSpawn.gameObject.transform.localScale;
+
+        while (time < duration)
+        {
+            _waterScaleModifier = Mathf.Lerp(startValue, endValue, time / duration);
+            _waterSpawn.gameObject.transform.localScale = startScale * _waterScaleModifier;
+            time += Time.deltaTime;
+            yield return null;
+        }
+        _waterSpawn.gameObject.transform.localScale = startScale * 0.1f;
+        _waterScaleModifier = 0.1f;
+        _waterShutDownPeriod = false;
+    }
+    
     private void Wind()
     {
         Debug.Log("Air triggered");
