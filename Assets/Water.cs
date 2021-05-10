@@ -11,6 +11,8 @@ public class Water : MonoBehaviour
     public float capsuleRadius;
     public float collisionForce;
     public LayerMask enemyLayer;
+    public ParticleSystem waterSplash;
+    public ParticleSystem waterSplashTextured;
 
     // Update is called once per frame
     void Update()
@@ -18,9 +20,10 @@ public class Water : MonoBehaviour
         var hits = Physics.OverlapCapsule(capsulePoint1.position, capsulePoint2.position, capsuleRadius, enemyLayer);
         foreach (var hit in hits)
         {
-            Debug.Log("i hit something mom");
             var dir = hit.transform.position - transform.position;
             hit.GetComponent<Rigidbody>().AddForce(dir.normalized * collisionForce, ForceMode.Impulse);
+            var splash = Instantiate(waterSplash, hit.transform.position, Quaternion.identity);
+            var splash2 = Instantiate(waterSplashTextured, hit.transform.position, Quaternion.identity);
         }
 
     }
