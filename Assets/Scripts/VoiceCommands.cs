@@ -102,10 +102,9 @@ public class VoiceCommands : MonoBehaviour
         if (_waterIsPlaying && !_waterShutDownPeriod)
         {
             // destroy old water
-            _waterIsPlaying = false;
             _waterShutDownPeriod = true;
         }
-        else
+        else if (! _waterIsPlaying && !_waterShutDownPeriod)
         {
             _waterSpawn = Instantiate(waterFX, transform.position, transform.rotation);
             _waterSpawn.transform.parent = transform;    // Set player as parent
@@ -127,8 +126,11 @@ public class VoiceCommands : MonoBehaviour
             yield return null;
         }
         _waterSpawn.gameObject.transform.localScale = startScale * 0.1f;
-        _waterScaleModifier = 0.1f;
+        //Destroy(_waterSpawn);
+        _waterScaleModifier = 1f;
         _waterShutDownPeriod = false;
+        _waterIsPlaying = false;
+        
     }
     
     private void Wind()
