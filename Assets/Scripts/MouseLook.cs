@@ -33,4 +33,6 @@ public class MouseLook : MonoBehaviour
         get => mouseSensitivity;           
         set => mouseSensitivity = value; 
     }
+
+    public float verticalRotation => xRotation;
 }

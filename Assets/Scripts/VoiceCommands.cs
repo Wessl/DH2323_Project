@@ -23,6 +23,7 @@ public class VoiceCommands : MonoBehaviour
     public string lightningKeyword;
     public string waterKeyword;
     public string windKeyword;
+    public string fireballKeyword;
 
     public bool limitLightningToOneEnemy;
     private bool _waterIsPlaying;
@@ -30,11 +31,14 @@ public class VoiceCommands : MonoBehaviour
     private ParticleSystem _waterSpawn;
     private float _waterScaleModifier;
 
+    private PyroCasting pyroCasting;
+
     void Start()
     {
         _keywordActions.Add(lightningKeyword, Lightning);
         _keywordActions.Add(waterKeyword, Water);
         _keywordActions.Add(windKeyword, Wind);
+        _keywordActions.Add(fireballKeyword, FireBall);
 
         _keywordRecognizer = new KeywordRecognizer(_keywordActions.Keys.ToArray()); //, confidence);
         _keywordRecognizer.OnPhraseRecognized += OnKeywordsRecognized;
@@ -47,6 +51,8 @@ public class VoiceCommands : MonoBehaviour
         {
             Debug.Log(mic);
         }
+        // Pyro ref
+        pyroCasting = GetComponent<PyroCasting>();
         
         // Misc
         _lightningDistanceToEnemyPropertyID = Shader.PropertyToID("DistanceToEnemy");
@@ -127,16 +133,22 @@ public class VoiceCommands : MonoBehaviour
         }
         _waterSpawn.gameObject.transform.localScale = startScale * 0.1f;
         //Destroy(_waterSpawn);
+        _waterSpawn.gameObject.GetComponent<Water>().WaterIsActive = false;
         _waterScaleModifier = 1f;
         _waterShutDownPeriod = false;
         _waterIsPlaying = false;
-        
     }
     
     private void Wind()
     {
         Debug.Log("Air triggered");
         Instantiate(windFX, transform.position, transform.rotation);
+    }
+
+    private void FireBall()
+    {
+        // Factor out fireball logic into own script - maybe do same for others
+        pyroCasting.SpawnPyro();
     }
 
     // Finds and returns the nearest enemy within 
@@ -157,7 +169,7 @@ public class VoiceCommands : MonoBehaviour
         return enemiesHit;
     }
 
-    // This needs to be BLAZING FAST
+    // This needs to be BLAZING FAST because it will be called a lot
     private float GetDist(GameObject a, Vector3 pos)
     {
         return (a.transform.position - pos).magnitude;

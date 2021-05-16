@@ -10,22 +10,33 @@ public class Water : MonoBehaviour
     public Transform capsulePoint2;
     public float capsuleRadius;
     public float collisionForce;
-    public LayerMask enemyLayer;
+    public LayerMask enemyAndFireLayer;
     public ParticleSystem waterSplash;
     public ParticleSystem waterSplashTextured;
+    private bool waterIsActive;
 
-    // Update is called once per frame
-    void Update()
+    void Start()
     {
-        var hits = Physics.OverlapCapsule(capsulePoint1.position, capsulePoint2.position, capsuleRadius, enemyLayer);
-        foreach (var hit in hits)
+        waterIsActive = true;
+    }
+    void FixedUpdate()
+    {
+        if (waterIsActive)
         {
-            var dir = hit.transform.position - transform.position;
-            hit.GetComponent<Rigidbody>().AddForce(dir.normalized * collisionForce, ForceMode.Impulse);
-            var splash = Instantiate(waterSplash, hit.transform.position, Quaternion.identity);
-            var splash2 = Instantiate(waterSplashTextured, hit.transform.position, Quaternion.identity);
+            var hits = Physics.OverlapCapsule(capsulePoint1.position, capsulePoint2.position, capsuleRadius, enemyAndFireLayer);
+                foreach (var hit in hits)
+                {
+                    var dir = hit.transform.position - transform.position;
+                    hit.GetComponent<Rigidbody>().AddForce(dir.normalized * collisionForce, ForceMode.Impulse);
+                    var splash = Instantiate(waterSplash, hit.transform.position, Quaternion.identity);
+                    var splash2 = Instantiate(waterSplashTextured, hit.transform.position, Quaternion.identity);
+                    if (hit.CompareTag("PyroBall"))
+                    {
+                        hit.GetComponent<FireBallLogic>().Extinguish();
+                    }
+                }
         }
-
+        
     }
 
     private void OnDrawGizmos()
@@ -33,5 +44,11 @@ public class Water : MonoBehaviour
         Gizmos.DrawWireSphere(capsulePoint1.position, capsuleRadius);
         Gizmos.DrawWireSphere(capsulePoint2.position, capsuleRadius);
         Gizmos.DrawLine(capsulePoint1.position, capsulePoint2.position);
+    }
+
+    public bool WaterIsActive
+    {
+        get => waterIsActive;
+        set => waterIsActive = value;
     }
 }
