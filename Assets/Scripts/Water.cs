@@ -36,7 +36,6 @@ public class Water : MonoBehaviour
                     }
                 }
         }
-        
     }
 
     private void OnDrawGizmos()

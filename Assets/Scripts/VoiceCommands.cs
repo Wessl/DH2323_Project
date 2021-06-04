@@ -19,6 +19,7 @@ public class VoiceCommands : MonoBehaviour
     public ParticleSystem waterFX;
     private int _lightningDistanceToEnemyPropertyID;
     public float lightningImpactDelay;
+    private AudioPlayer audio;
 
     public string lightningKeyword;
     public string waterKeyword;
@@ -59,6 +60,9 @@ public class VoiceCommands : MonoBehaviour
         _waterIsPlaying = false;
         _waterShutDownPeriod = false;
         _waterScaleModifier = 1;
+        
+        // Audio
+        audio = GameObject.FindWithTag("Audio").GetComponent<AudioPlayer>();
     }
 
     void Update()
@@ -94,6 +98,8 @@ public class VoiceCommands : MonoBehaviour
                 break;
             }
         }
+        // Play sound
+        audio.PlayLightningSFX();
     }
 
     IEnumerator LightningPushForce(GameObject enemy, Vector3 direction)
@@ -116,6 +122,8 @@ public class VoiceCommands : MonoBehaviour
             _waterSpawn.transform.parent = transform;    // Set player as parent
             _waterIsPlaying = true;
         }
+        // Play water sfx - also need ability to turn off before being functional
+        // audio.PlayWaterSFX();
     }
 
     IEnumerator WaterShutDown(float endValue, float duration)
@@ -143,12 +151,15 @@ public class VoiceCommands : MonoBehaviour
     {
         Debug.Log("Air triggered");
         Instantiate(windFX, transform.position, transform.rotation);
+        // need way to turn off just like with water
+        // audio.PlayAirSFX();
     }
 
     private void FireBall()
     {
         // Factor out fireball logic into own script - maybe do same for others
         pyroCasting.SpawnPyro();
+        audio.PlayFireSFX();
     }
 
     // Finds and returns the nearest enemy within 

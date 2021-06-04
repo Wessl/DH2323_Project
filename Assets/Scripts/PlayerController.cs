@@ -40,7 +40,6 @@ public class PlayerController : MonoBehaviour
         float z = Input.GetAxisRaw("Vertical");
 
         Vector3 move = transform.right * x + transform.forward * z;
-
         controller.Move(Time.deltaTime * speed * move);
 
         if (Input.GetButtonDown("Jump") && _isGrounded)
@@ -49,7 +48,6 @@ public class PlayerController : MonoBehaviour
         }
 
         _velocity.y += gravity * Time.deltaTime;
-
         controller.Move(_velocity * Time.deltaTime);
     }
     

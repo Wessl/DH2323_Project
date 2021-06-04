@@ -7,6 +7,7 @@ TagManager:
   - Enemy
   - Water
   - PyroBall
+  - Audio
   layers:
   - Default
   - TransparentFX

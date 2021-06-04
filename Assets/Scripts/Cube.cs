@@ -12,6 +12,7 @@ public class Cube : MonoBehaviour
         if (other.CompareTag("PyroBall"))
         {
             Instantiate(shatteredCube, transform.position, transform.rotation);
+            GameObject.FindWithTag("Audio").GetComponent<AudioPlayer>().PlayShatterSFX();
             Destroy(gameObject);
         }
     }
