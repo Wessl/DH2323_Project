@@ -4926,7 +4926,7 @@ MonoBehaviour:
   capsulePoint1: {fileID: 2433539765521406468}
   capsulePoint2: {fileID: 6784064664899722088}
   capsuleRadius: 1.18
-  collisionForce: 10
+  collisionForce: 1
   enemyAndFireLayer:
     serializedVersion: 2
     m_Bits: 384

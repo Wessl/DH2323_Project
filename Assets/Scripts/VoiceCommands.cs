@@ -20,6 +20,7 @@ public class VoiceCommands : MonoBehaviour
     private int _lightningDistanceToEnemyPropertyID;
     public float lightningImpactDelay;
     private AudioPlayer audio;
+    private WaterAudio _waterAudio;
 
     public string lightningKeyword;
     public string waterKeyword;
@@ -63,6 +64,7 @@ public class VoiceCommands : MonoBehaviour
         
         // Audio
         audio = GameObject.FindWithTag("Audio").GetComponent<AudioPlayer>();
+        _waterAudio = GameObject.Find("WaterAudio").GetComponent<WaterAudio>();
     }
 
     void Update()
@@ -123,7 +125,7 @@ public class VoiceCommands : MonoBehaviour
             _waterIsPlaying = true;
         }
         // Play water sfx - also need ability to turn off before being functional
-        // audio.PlayWaterSFX();
+        _waterAudio.PlayWater();
     }
 
     IEnumerator WaterShutDown(float endValue, float duration)
@@ -145,6 +147,7 @@ public class VoiceCommands : MonoBehaviour
         _waterScaleModifier = 1f;
         _waterShutDownPeriod = false;
         _waterIsPlaying = false;
+        _waterAudio.StopWater();
     }
     
     private void Wind()
